@@ -8,6 +8,7 @@ main_dir=config.main_dir
 sketch_dir=config.sketch_dir
 dnfs_dir=config.dnfs_dir
 batch_size=config.batch_size
+training_iter=config.training_iter
 
 def file_to_list(text):
     """
@@ -52,6 +53,7 @@ def source(name_list,batched):
     source_dataset=source_dataset.map(lambda name:tf.py_func(read_sketch,[name],[tf.float32]))
     if (batched):
         source_dataset=source_dataset.batch(batch_size)
+    source_dataset=source_dataset.repeat(training_iter)
     iter=source_dataset.make_initializable_iterator()
     return iter
 
@@ -82,6 +84,7 @@ def target(name_list,batched):
     target_dataset=target_dataset.map(lambda name:tf.py_func(read_dnfs,[name],[tf.float32]))
     if (batched):
         target_dataset=target_dataset.batch(batch_size)
+    target_dataset=target_dataset.repeat(training_iter)
     iter=target_dataset.make_initializable_iterator()
     return iter
 
