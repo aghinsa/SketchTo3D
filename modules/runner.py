@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import os
+import time
 
 import config
 config.init()
@@ -22,7 +23,7 @@ target=target_iterator.get_next()
 
 pred=model.encoderNdecoder(source)
 cost=loss.total_loss(pred,target)
-accuracy,_=tf.metrics.accuracy(labels=target_next,predictions=pred)
+accuracy,_=tf.metrics.accuracy(labels=target,predictions=pred)
 optimizer=tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 init=tf.global_variables_initializer()
 linit=tf.local_variables_initializer()
