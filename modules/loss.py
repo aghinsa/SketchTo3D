@@ -28,9 +28,13 @@ def normal_loss(pred,truth,mask):
     mask="
     return normalized loss scalar
     """
-    nloss=depth_loss(pred,truth,mask)
-    #nloss=loss*pred.get_shape()[3]
-    return nloss
+    loss=tf.subtract(pred,truth)
+    m=mask
+    mask=tf.stack((mask,m,m),-1)
+    loss=tf.abs(loss)
+    loss=tf.multiply(loss,mask)
+    loss=tf.reduce_mean(loss)
+    return loss
 
 def mask_loss(pred,truth):
     #[-1,1] -> [0,1]
@@ -52,13 +56,14 @@ def total_loss(pred,truth):
 
     truth=truth[0]
     depth_pred=pred[:,:,:,:,0]
-    depth_truth=truth[:,:,:,:,0]
+    depth_truth=truth[:,:,:,0]
     normal_pred=pred[:,:,:,:,1:4]
-    normal_truth=truth[:,:,:,:,1:4]
+    normal_truth=truth[:,:,:,1:4]
     mask_pred=pred[:,:,:,:,4]
-    mask_truth=truth[:,:,:,:,4]
+    mask_truth=truth[:,:,:,4]
 
     dl=depth_loss(depth_pred,depth_truth,mask_truth)
     nl=normal_loss(normal_pred,normal_truth,mask_truth)
     ml=mask_loss(mask_pred,mask_truth)
     return (dl+ml+nl)
+    #return(nl)
