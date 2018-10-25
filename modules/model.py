@@ -75,7 +75,7 @@ def encoderNdecoder(
 
             decoded = tf.nn.l2_normalize(
                 decoded,
-                axis=[0, 1, 2, 3],
+                axis=[1, 2, 3],
                 epsilon=1e-12,
                 name=None,
                 dim=None
@@ -127,9 +127,16 @@ def upsample(
         activation_fn=activation_fn)
 
 
-# def Unet(images,out_channels=5,batch_size=2):
-#     decoded=encoderNdecoder(images,out_channels)
-#     return decoded
+        
+    
+    
+
+
+
+
+########################################
+########################################
+########################################
 
 def _pretty_print(var_names):
     '''

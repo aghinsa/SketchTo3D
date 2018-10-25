@@ -61,4 +61,3 @@ for epoch in range(training_iter):
         print("     accuracy = {}".format(acc))
         toc = time.clock()
         print("     Time taken :{}".format((toc - tic) / 60))
-
