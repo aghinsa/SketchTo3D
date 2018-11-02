@@ -73,43 +73,52 @@ def collect(main_dir,sess):
     input_image=read_input(input_sketch)
     
     preds=model.encoderNdecoder(input_image)
-	#write input image
-    img_input = saturate_image(unnormalize_image(input_image, maxval=65535.0), dtype=tf.uint16)
-    png_input = encode_batch_images(img_input)
-    name_input = os.path.join(output_maps,'input.png')
-    write_image(name_input,png_input)
-	
-    for view in range(12):
-        preds_depth=preds[0,view,:,:,0]
-        preds_normal=preds[0,view,:,:,1:4]
-        preds_mask=preds[0,view,:,:,4]
-        #result
-        img_output=saturate_image(unnormalize_image(preds[0:view,:,:,:],maxval=65535.0),dtype=tf.uint16)
-        png_output=encode_batch_images(img_output)
-        name_output = os.path.join(output_maps,('pred-'+output_prefix+'--'+view+'.png'))
-        write_image(name_output,png_output)
-        #normals
-        name_normal = os.path.join(output_maps,('normal-'+output_prefix+'--'+view+'.png'))
-        img_normal = saturate_image(unnormalize_image(preds_normal,
-							maxval=65535.0), dtype=tf.uint16)
-        png_normal = encode_batch_images(img_normal)
-        write_image(name_normal,png_normal)
-        #depth
-        name_depth = os.path.join(output_maps,('depth-'+output_prefix+'--'+view+'.png'))
-        img_depth = saturate_image(unnormalize_image(preds_depth, 
-								maxval=65535.0), dtype=tf.uint16)
-        png_depth = encode_batch_images(img_depth)
-        write_image(name_depth,png_depth)
-        #mask
-        name_mask = os.path.join(output_maps,('mask-'+output_prefix+'--'+view+'.png'))
-        img_mask = saturate_image(unnormalize_image(preds_mask, 
-								maxval=65535.0), dtype=tf.uint16)
-        png_mask = encode_batch_images(img_mask)
-        write_image(name_mask,png_mask)
-        #Export to results
-        img_output=saturate_image(unnormalize_image(preds[0:view,:,:,:],
-		 								maxval=65535.0), dtype=tf.uint16)
-        png_output=encode_batch_images(img_output)
-        name_output = os.path.join(output_results,('pred-'+output_prefix+'--'+view+'.png'))
-        write_image(name_output,png_output)
-		
+	# #write input image
+    # img_input = saturate_image(unnormalize_image(input_image, maxval=65535.0), dtype=tf.uint16)
+    # png_input = encode_batch_images(img_input)
+    # name_input = os.path.join(output_maps,'input.png')
+    # write_image(name_input,png_input)
+	# 
+    # for view in range(12):
+    #     preds_depth=preds[0,view,:,:,0]
+    #     preds_normal=preds[0,view,:,:,1:4]
+    #     preds_mask=preds[0,view,:,:,4]
+    #     #result
+    #     img_output=saturate_image(unnormalize_image(preds[0:view,:,:,:],maxval=65535.0),dtype=tf.uint16)
+    #     png_output=encode_batch_images(img_output)
+    #     name_output = os.path.join(output_maps,('pred-'+output_prefix+'--'+view+'.png'))
+    #     write_image(name_output,png_output)
+    #     #normals
+    #     name_normal = os.path.join(output_maps,('normal-'+output_prefix+'--'+view+'.png'))
+    #     img_normal = saturate_image(unnormalize_image(preds_normal,
+	# 						maxval=65535.0), dtype=tf.uint16)
+    #     png_normal = encode_batch_images(img_normal)
+    #     write_image(name_normal,png_normal)
+    #     #depth
+    #     name_depth = os.path.join(output_maps,('depth-'+output_prefix+'--'+view+'.png'))
+    #     img_depth = saturate_image(unnormalize_image(preds_depth, 
+	# 							maxval=65535.0), dtype=tf.uint16)
+    #     png_depth = encode_batch_images(img_depth)
+    #     write_image(name_depth,png_depth)
+    #     #mask
+    #     name_mask = os.path.join(output_maps,('mask-'+output_prefix+'--'+view+'.png'))
+    #     img_mask = saturate_image(unnormalize_image(preds_mask, 
+	# 							maxval=65535.0), dtype=tf.uint16)
+    #     png_mask = encode_batch_images(img_mask)
+    #     write_image(name_mask,png_mask)
+    #     #Export to results
+    #     img_output=saturate_image(unnormalize_image(preds[0:view,:,:,:],
+	# 	 								maxval=65535.0), dtype=tf.uint16)
+    #     png_output=encode_batch_images(img_output)
+    #     name_output = os.path.join(output_results,('pred-'+output_prefix+'--'+view+'.png'))
+    #     write_image(name_output,png_output)
+
+check_dir=
+#img_dir/hires/
+img_dir=
+sess=tf.Session()
+saver = tf.train.import_meta_graph(os.path.join(check_dir,'model.meta'))
+saver.restore(sess, tf.train.latest_checkpoint('check_dir'))
+pred=collect(img_dir,sess)
+#prediction = sess.run(y4,feed_dict={x:sampletest})
+
