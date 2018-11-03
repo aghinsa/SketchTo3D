@@ -25,7 +25,7 @@ def encoderNdecoder(
 
     * results: N * 12 * 256 * 256 * 5
     """
-    with tf.name_scope("model"):    
+    with tf.name_scope("model"):
         images=tf.reshape(images,[-1,256,256,2])
         #images = tf.cast(images, tf.float32)
         with tf.variable_scope("encoder"):
@@ -123,9 +123,9 @@ def upsample(
         activation_fn=activation_fn)
 
 
-        
-    
-    
+
+
+
 
 
 
@@ -162,12 +162,3 @@ def test():
     results = encoderNdecoder(dummy_sketch)
     print(results.shape)
     _pretty_print([x.name for x in tf.global_variables()])
-
-encoderNdecoder_lite = partial(encoderNdecoder, out_channels=5,
-        views=12,
-        normalizer_fn=tf_layers.batch_norm,
-        activation=tf.nn.leaky_relu)
-encoderNdecoder_lite= tf.contrib.layers.recompute_grad(encoderNdecoder_lite)
-
-if __name__ == "__main__":
-    test()

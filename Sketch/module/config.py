@@ -18,23 +18,23 @@ dnfs_dir=os.path.join(main_dir,'dn')
 name_list_path=os.path.join(main_dir,'train-list.txt')
 #name_list_path=os.path.join(main_dir,'temp_list.txt')
 
-#is training
-is_training=True
-#sketch val
-sketch_value=1
-# Logging
-log_dir=os.path.join(home,'holojest','Sketch','logs')
-train_log_dir=os.path.join(log_dir,'train')
-if not os.path.exists(train_log_dir):
-    os.mkdir(train_log_dir)
-
-eval_log_dir=os.path.join(log_dir,'eval')
-if not os.path.exists(eval_log_dir):
-    os.mkdir(eval_log_dir)
-
-checkpoints_dir=os.path.join(home,'holojest','Sketch','checkpoints')
-
-is_adversial= True
+# #is training
+# is_training=True
+# #sketch val
+# sketch_value=1
+# # Logging
+# log_dir=os.path.join(home,'holojest','Sketch','logs')
+# train_log_dir=os.path.join(log_dir,'train')
+# if not os.path.exists(train_log_dir):
+#     os.mkdir(train_log_dir)
+#
+# eval_log_dir=os.path.join(log_dir,'eval')
+# if not os.path.exists(eval_log_dir):
+#     os.mkdir(eval_log_dir)
+#
+# checkpoints_dir=os.path.join(home,'holojest','Sketch','checkpoints')
+#
+# is_adversial= True
 # Loss tuning
 loss_normalize=True
 mask_threshold=0.9
