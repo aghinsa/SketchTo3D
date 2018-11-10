@@ -3,16 +3,19 @@ import tensorflow as tf
 import cv2
 import numpy as np
 import module.model as model
+import sys
 
 def read_input(source_directory, value=0):
     """
     return:[256,256,2] dtype=float32
     """
     f_dir = os.path.join(source_directory, 'sketch-F-{}.png'.format(value))
+    #f_dir = os.path.join(source_directory, '1.jpeg')
     c0 = cv2.imread(f_dir, 0)
     c0=cv2.resize(c0,(256,256))
     c0 = normalize_image(c0)
     s_dir = os.path.join(source_directory, 'sketch-S-{}.png'.format(value))
+    #s_dir = os.path.join(source_directory, '2.jpeg')
     c1 = cv2.imread(s_dir, 0)
     c1=cv2.resize(c1,(256,256))
     c1 = normalize_image(c1)
@@ -66,81 +69,102 @@ def apply_mask(content, mask):
     masked=tf.multiply(content,m)
     return masked
 
-#run this from input image folder
-input_image=read_input('.')
-input_image=np.reshape(input_image,[-1,256,256,2])
-train_dir=('./Checkpoints')
-x=tf.placeholder(dtype=tf.float32,shape=[None,256,256,2])
-pred=model.encoderNdecoder(x)
+#creating dummy target images
 
-main_dir='.'
-output_dir=os.path.join(main_dir,'output')
-output_image_dir=os.path.join(output_dir,'images')
-output_results=os.path.join(output_dir,'result')
-output_prefix = 'dn14'
+def collect(main_dir):
+    #run this from input image folder
 
-
-with tf.Session() as sess:
-    #writing input image
-    in_reshape=tf.reshape(input_image,[256,256,2])
-    img_input = saturate_image(unnormalize_image(input_image, maxval=65535.0), dtype=tf.uint16)
-    png_input = tf.image.encode_png(img_input[0,:,:,:])
-    png_input = sess.run(png_input)
-    name_input = os.path.join(output_image_dir,'input.png')
-    write_image(name_input, png_input)
-
-    saver = tf.train.Saver()
-    #saver.restore(sess,train_dir+'/model.ckpt-8500')
-    saver.restore(sess,train_dir+'/model.ckpt-36500')
-
-    feed_dict={x:input_image}
-    preds=sess.run(pred,feed_dict)
-
-    ################################################
-    preds=preds*255*2
-    #preds=apply_mask(preds)
-    for view in range(12):
-        print(view+1)
+    #main_dir='./Datasets/model_name/'
+    #input_image=read_input('./Datasets/model_name/images')
+    input_image=read_input(os.path.join(main_dir,'images'))
+    print("Reading image")
+    input_image=np.reshape(input_image,[-1,256,256,2])
+    train_dir=('./checkpoints')
+    x=tf.placeholder(dtype=tf.float32,shape=[None,256,256,2])
+    pred=model.encoderNdecoder(x)
 
 
-        preds_mask=preds[0,view,:,:,4]
-        preds_mask=tf.reshape(preds_mask,[256,256,1])
-        preds_depth=preds[0,view,:,:,0]
-        preds_depth=apply_mask(preds_depth,preds_mask)
-        preds_depth=tf.reshape(preds_depth,[256,256,1])
-        preds_normal=preds[0,view,:,:,1:4]
-        preds_normal=apply_mask(preds_normal,preds_mask)
-        #result
-        img_output=saturate_image(unnormalize_image(preds[0,view,:,:,0:4],maxval=65535.0),dtype=tf.uint16)
-        png_output=tf.image.encode_png(img_output)
-        name_output = os.path.join(output_image_dir,('pred-'+output_prefix+'--'+str(view)+'.png'))
-        png_output=sess.run(png_output)
-        write_image(name_output,png_output)
-        #normals
-        name_normal = os.path.join(output_image_dir,('normal-'+output_prefix+'--'+str(view)+'.png'))
-        img_normal = saturate_image(unnormalize_image(preds_normal,
-                            maxval=65535.0), dtype=tf.uint16)
-        png_normal = tf.image.encode_png(img_normal)
-        png_normal=sess.run(png_normal)
-        write_image(name_normal,png_normal)
-        #depth
-        name_depth = os.path.join(output_image_dir,('depth-'+output_prefix+'--'+str(view)+'.png'))
-        img_depth = saturate_image(unnormalize_image(preds_depth,
+    output_dir=os.path.join(main_dir,'output')
+    output_image_dir=os.path.join(output_dir,'images')
+    output_results=os.path.join(output_dir,'result')
+    output_prefix = 'dn14'
+
+
+    with tf.Session() as sess:
+
+        #writing input image
+        in_reshape=tf.reshape(input_image,[256,256,2])
+        #stack verticaly
+        in_ver_stack=tf.concat([in_reshape[:,:,0],in_reshape[:,:,1]],axis=1)
+        img_input = saturate_image(unnormalize_image(in_ver_stack, maxval=65535.0), dtype=tf.uint16)
+        img_input=tf.reshape(img_input,[256,512,-1])
+        png_input = tf.image.encode_png(img_input)
+        png_input = sess.run(png_input)
+        name_input = os.path.join(output_image_dir,'input.png')
+        write_image(name_input, png_input)
+
+        saver = tf.train.Saver()
+        #saver.restore(sess,train_dir+'/model.ckpt-8500')
+        saver.restore(sess,train_dir+'/model.ckpt-36500')
+
+        feed_dict={x:input_image}
+        preds=sess.run(pred,feed_dict)
+
+        ################################################
+        preds=preds*255*2
+        #preds=apply_mask(preds)
+        for view in range(12):
+            #print(view+1)
+            sys.stdout.write('\r')
+            print('processing views {}% completed'.format((view+1)*100/12))
+
+
+            preds_mask=preds[0,view,:,:,4]
+            preds_mask=tf.reshape(preds_mask,[256,256,1])
+            preds_depth=preds[0,view,:,:,0]
+            preds_depth=apply_mask(preds_depth,preds_mask)
+            preds_depth=tf.reshape(preds_depth,[256,256,1])
+            preds_normal=preds[0,view,:,:,1:4]
+            preds_normal=apply_mask(preds_normal,preds_mask)
+            #dummy truth
+            target_image = tf.ones([1,256, 256, 4])
+            img_gt = saturate_image(unnormalize_image(target_image, maxval=65535.0), dtype=tf.uint16)
+            name_gt = os.path.join(output_image_dir,('gt-'+output_prefix+'--'+str(view)+'.png'))
+            png_target = tf.image.encode_png(img_gt[0,:,:,:])
+            png_target=sess.run(png_target)
+            write_image(name_gt, png_target)
+
+            #result
+            img_output=saturate_image(unnormalize_image(preds[0,view,:,:,0:4],maxval=65535.0),dtype=tf.uint16)
+            png_output=tf.image.encode_png(img_output)
+            name_output = os.path.join(output_image_dir,('pred-'+output_prefix+'--'+str(view)+'.png'))
+            png_output=sess.run(png_output)
+            write_image(name_output,png_output)
+            #normals
+            name_normal = os.path.join(output_image_dir,('normal-'+output_prefix+'--'+str(view)+'.png'))
+            img_normal = saturate_image(unnormalize_image(preds_normal,
                                 maxval=65535.0), dtype=tf.uint16)
-        png_depth = tf.image.encode_png(img_depth)
-        png_depth=sess.run(png_depth)
-        write_image(name_depth,png_depth)
-        #mask
-        name_mask = os.path.join(output_image_dir,('mask-'+output_prefix+'--'+str(view)+'.png'))
-        img_mask = saturate_image(unnormalize_image(preds_mask,
-                                maxval=65535.0), dtype=tf.uint16)
-        png_mask = tf.image.encode_png(img_mask)
-        png_mask=sess.run(png_mask)
-        write_image(name_mask,png_mask)
-        #Export to results
-        img_output=saturate_image(unnormalize_image(preds[0,view,:,:,1:4],
-                                        maxval=65535.0), dtype=tf.uint16)
-        png_output=tf.image.encode_png(img_output)
-        name_output = os.path.join(output_results,('pred-'+output_prefix+'--'+str(view)+'.png'))
-        png_output=sess.run(png_output)
-        write_image(name_output,png_output)
+            png_normal = tf.image.encode_png(img_normal)
+            png_normal=sess.run(png_normal)
+            write_image(name_normal,png_normal)
+            #depth
+            name_depth = os.path.join(output_image_dir,('depth-'+output_prefix+'--'+str(view)+'.png'))
+            img_depth = saturate_image(unnormalize_image(preds_depth,
+                                    maxval=65535.0), dtype=tf.uint16)
+            png_depth = tf.image.encode_png(img_depth)
+            png_depth=sess.run(png_depth)
+            write_image(name_depth,png_depth)
+            #mask
+            name_mask = os.path.join(output_image_dir,('mask-'+output_prefix+'--'+str(view)+'.png'))
+            img_mask = saturate_image(unnormalize_image(preds_mask,
+                                    maxval=65535.0), dtype=tf.uint16)
+            png_mask = tf.image.encode_png(img_mask)
+            png_mask=sess.run(png_mask)
+            write_image(name_mask,png_mask)
+            #Export to results
+            img_output=saturate_image(unnormalize_image(preds[0,view,:,:,1:4],
+                                            maxval=65535.0), dtype=tf.uint16)
+            png_output=tf.image.encode_png(img_output)
+            name_output = os.path.join(output_results,('pred-'+output_prefix+'--'+str(view)+'.png'))
+            png_output=sess.run(png_output)
+            write_image(name_output,png_output)
