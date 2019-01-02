@@ -1,3 +1,4 @@
+tensorflow
 toposort==1.5
 networkx==2.1
 pytest==3.5.1
