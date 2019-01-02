@@ -39,7 +39,11 @@ views of a character and outputs,12 different views;depth and normal maps for ea
 Follow [this](https://github.com/happylun/SketchModeling/tree/master/Fusion)  
 > ReconstructMesh.exe 1 FS sketch_folder map_folder output_result_folder view.off  
   PoissonRecon.exe --in points.ply --out mesh.ply --depth 11 --samplesPerNode 5.0 --pointWeight 0.1    
-   ReconstructMesh.exe 2 FS sketch_folder map_folder output_result_folder view.off
+   ReconstructMesh.exe 2 FS sketch_folder map_folder output_result_folder view.off  
+
+* sketch_folder: 2 sketches  
+* map_folder : maps,masks,depths  
+* output_folder : anything  
 
 
 ### <a name="citation"></a> Citation  
