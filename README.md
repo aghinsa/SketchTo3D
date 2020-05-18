@@ -12,7 +12,7 @@ Uses deep learning to convert 2d pencil drawings to 3d model.Based on [this pape
 views of a character and outputs,12 different views;depth and normal maps for each view.The outputed images can be fused with [this](https://github.com/happylun/SketchModeling/tree/master/Fusion).  
 
 ### <a name="training"></a> Training
-* Training data is available [here](#citation).    
+* Training data is available [here](https://people.cs.umass.edu/~zlun/papers/SketchModeling/).    
 * Clone the repo (*root*).  
 * Install dependencies for [gradient checkpointing](https://github.com/openai/gradient-checkpointing)  
     * `pip install -r root/requirements.txt`  
