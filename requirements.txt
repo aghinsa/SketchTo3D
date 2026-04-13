@@ -1,5 +1,5 @@
 tensorflow
 toposort==1.5
 networkx==2.1
-pytest==3.5.1
+pytest==9.0.3
 opencv-contrib-python
